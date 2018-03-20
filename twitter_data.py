@@ -21,7 +21,9 @@ def get_data():
     consumer_secret = "x4MkUYBPEVu1KnVGqy0JImrq29f929xuVFEQFMyeMmUJBivqVU"
     access_token = "975761944962650112-HpzmKcjD5IZ2Zb82cqCKnCEAMURR0lF"
     access_token_secret = "l9JbivssGKANtQExneLDMByj9vHGYUrwkNHvDBHR9VpQz"
-    URL = "https://api.twitter.com/1.1/search/tweets.json?q=AAPL:\)&result_type=popular&count=100&tweet_mode=extended"
+   
+    #URL for "positive" tweets on AAPL
+    URL = "https://api.twitter.com/1.1/search/tweets.json?q=AAPL:)&result_type=popular&count=100&tweet_mode=extended"
     
     consumer = oauth.Consumer(key=consumer_key, secret = consumer_secret)
     access_token = oauth.Token(key = access_token, secret = access_token_secret)
@@ -31,32 +33,24 @@ def get_data():
     # extracting data in json format and writing it to CSV file
     for tweet in json.loads(data)['statuses']:
         try:
-            ''' 
+           # info = "\"" + tweet['full_text'] + "\"" + "," + tweet["retweet_count"] + "," + tweet["favorite_count"] + "1"
+            #file.write(info)
+            file.write("\"")
             file.write(tweet['full_text'])
-            file.write(",")
-            file.write(tweet["retweet_count"])
-            file.write(",")
-            file.write(tweet["favorite_count"])
-            file.write(",1")
-            '''
-            #print(tweet["full_text"], tweet["retweet_count"], tweet["favorite_count"])
-            info = "\"" + tweet['full_text'] + "\"" + "," + tweet["retweet_count"] + "," + tweet["favorite_count"] + "1"
-            #info = ",".join([str("\"" + tweet['full_text'] + "\""),tweet["retweet_count"] ,tweet["favorite_count"] , "1"])            
-            print(info)
-            file.write(info)
-            file.write("\n")
+            file.write("\",\n")
         except Exception: 
             pass
-    URLnegative = "https://api.twitter.com/1.1/search/tweets.json?q=AAPL:\(&result_type=popular&count=100&tweet_mode=extended"
+    file.close()
+    #Search query for "negative" tweets about AAPL 
+    URLnegative = "https://api.twitter.com/1.1/search/tweets.json?q=AAPL:(&result_type=popular&count=100&tweet_mode=extended"
     response, data = client.request(URLnegative)
+    file = open("Apple_Tweets.csv", "a")
     # extracting data in json format and writing it to CSV file 
     for tweet in json.loads(data)['statuses']:
+        file.write("\",\n")
         try:
-            #print(tweet["retweet_count"])
-            info =  "\"" + tweet['full_text']+ "\"" + "," + tweet["retweet_count"] + "," + tweet["favorite_count"] + ",1"
-            print(info)
-            file.write(info)
-            file.write("\n")    
+            file.write("\"")
+            file.write(tweet['full_text'])
         except Exception:
             pass
     file.close()
