@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Apr  9 12:55:39 2018
-
-@author: yumen
-"""
-import csv
+#import csv
+import re
 from textblob import TextBlob
 #Title + Description
-file = csv.reader(open("tweets_30day_Apple.csv", "r"), delimeter = ",") #file with scores
-file_polarity = open("tweets_30day_polarity.csv", "w")  #file we write results to
+file = open("tweets_30day_Apple.csv", "r")#file with scores
+file_polarity = open("tweets_polarity.csv", "w")  #file we write results to
 polarity_per_day = {}       #stores the sum of polarities for every date
 count_per_day = {}  #counts entries per day
 total = count = 0   #pretty sure this is not used 
@@ -23,30 +19,31 @@ for line in file.readlines():
         tweet, date = string.split(",") 
         date = date[3:10]
         
-        
+        tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
         if ";" not in date:               #Used to remove some faulty entries 
             tweetBlob = TextBlob(tweet) #Create Textblob
             polarity = tweetBlob.sentiment.polarity #Get polarity
-            if date in polarity_per_day.keys(): #Enter into dictionary
-                polarity_per_day[date] +=polarity
-                count_per_day[date] +=1
+            if date == "\n" or date =="":
+                pass
             else:
-                polarity_per_day[date] = polarity
-                count_per_day[date] = 1
+                if date in polarity_per_day.keys(): #Enter into dictionary
+                    polarity_per_day[date] +=polarity
+                    count_per_day[date] +=1
+                else:
+                    polarity_per_day[date] = polarity
+                    count_per_day[date] = 1
             string = ""
 file_polarity.write("Company,")
 for key in count_per_day.keys(): #Write keys to csv(Header)
     string= key+","
     file_polarity.write(string)
 file_polarity.write("\nApple,")
+print("Apple")
 for key in polarity_per_day.keys(): #Write polarities to CSV
     daily = polarity_per_day[key]/count_per_day[key]
     print(key, ": ", daily)
     string = str(daily) + ","
     file_polarity.write(string)
-
-'''
-
 file_polarity.write("\nTesla,")
 file = open("tweets_30day_Tesla.csv", "r")
 polarity_per_day = {}
@@ -57,15 +54,19 @@ for line in file.readlines():
     if "," in line:
         tweet, date = string.split(",")
         date = date[3:10]
+        tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
         if ";" not in date:                
             tweetBlob = TextBlob(tweet)
             polarity = tweetBlob.sentiment.polarity
-            if date in polarity_per_day.keys():
-                polarity_per_day[date] +=polarity
-                count_per_day[date] +=1
+            if date == "\n" or date =="":
+                pass
             else:
-                polarity_per_day[date] = polarity
-                count_per_day[date] = 1
+                if date in polarity_per_day.keys(): #Enter into dictionary
+                    polarity_per_day[date] +=polarity
+                    count_per_day[date] +=1
+                else:
+                    polarity_per_day[date] = polarity
+                    count_per_day[date] = 1
             string = ""
 print("Tesla")
 for key in polarity_per_day.keys():
@@ -84,15 +85,19 @@ for line in file.readlines():
     if "," in line:
         tweet, date = string.split(",")
         date = date[3:10]
+        tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
         if ";" not in date:                
             tweetBlob = TextBlob(tweet)
             polarity = tweetBlob.sentiment.polarity
-            if date in polarity_per_day.keys():
-                polarity_per_day[date] +=polarity
-                count_per_day[date] +=1
+            if date == "\n" or date =="" or date[0] == "e":
+                pass
             else:
-                polarity_per_day[date] = polarity
-                count_per_day[date] = 1
+                if date in polarity_per_day.keys(): #Enter into dictionary
+                    polarity_per_day[date] +=polarity
+                    count_per_day[date] +=1
+                else:
+                    polarity_per_day[date] = polarity
+                    count_per_day[date] = 1
             string = ""
 print("Goldman Sachs")
 for key in polarity_per_day.keys():
@@ -111,15 +116,19 @@ for line in file.readlines():
     if "," in line:
         tweet, date = string.split(",")
         date = date[3:10]
+        tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
         if ";" not in date:                
             tweetBlob = TextBlob(tweet)
             polarity = tweetBlob.sentiment.polarity
-            if date in polarity_per_day.keys():
-                polarity_per_day[date] +=polarity
-                count_per_day[date] +=1
+            if date == "\n" or date =="":
+                pass
             else:
-                polarity_per_day[date] = polarity
-                count_per_day[date] = 1
+                if date in polarity_per_day.keys(): #Enter into dictionary
+                    polarity_per_day[date] +=polarity
+                    count_per_day[date] +=1
+                else:
+                    polarity_per_day[date] = polarity
+                    count_per_day[date] = 1
             string = ""
 print("British Petroleum")
 for key in polarity_per_day.keys():
@@ -127,5 +136,4 @@ for key in polarity_per_day.keys():
     print(key, ": ", daily)
     string = str(daily) + ","
     file_polarity.write(string)    
-'''
 file_polarity.close()
