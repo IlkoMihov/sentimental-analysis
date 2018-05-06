@@ -6,54 +6,74 @@ Created on Mon Mar 19 11:31:52 2018
 """
 
 import json
-import oauth2 as oauth
-import pandas as pd
+import requests as r 
+''' 
+from textblob import TextBlob
+import nltk 
+from nltk.tokenize import sent_tokenize, word_tokenize
+print(sent_tokenize(example_sentence))  # Split text by sentence ( may be usefull to get rid of useless information in tweets)
+print(workd_tokenize(example_sentence))  #Split sentence by words
 
+''' 
 
-
-
-def data_to_df(filename):
-    file = open(filename, "r")
-    pd.DataFrame.from_csv(file)
 
 def get_data():
-    consumer_key = "H9OKRfMqEBib1x5Qgg01Nn9u6"
-    consumer_secret = "x4MkUYBPEVu1KnVGqy0JImrq29f929xuVFEQFMyeMmUJBivqVU"
-    access_token = "975761944962650112-HpzmKcjD5IZ2Zb82cqCKnCEAMURR0lF"
-    access_token_secret = "l9JbivssGKANtQExneLDMByj9vHGYUrwkNHvDBHR9VpQz"
-   
-    #URL for "positive" tweets on AAPL
-    URL = "https://api.twitter.com/1.1/search/tweets.json?q=AAPL:)&result_type=popular&count=100&tweet_mode=extended"
+    bearer_token_encoded = "czhXUVdFT1RKckRPUG9xckFURkRPdFFMWDpkMDJYbExBdlZoaG10dzNSQVYySEh3eGZSZk9BemNHdW4zY2JnUWd4eGdhbng0TklJeA=="
     
-    consumer = oauth.Consumer(key=consumer_key, secret = consumer_secret)
-    access_token = oauth.Token(key = access_token, secret = access_token_secret)
-    client = oauth.Client(consumer, access_token)
-    response, data = client.request(URL)
-    file = open("Apple_tweets.csv", "w")
-    # extracting data in json format and writing it to CSV file
-    for tweet in json.loads(data)['statuses']:
-        try:
-           # info = "\"" + tweet['full_text'] + "\"" + "," + tweet["retweet_count"] + "," + tweet["favorite_count"] + "1"
-            #file.write(info)
-            file.write("\"")
-            file.write(tweet['full_text'])
-            file.write("\",\n")
-        except Exception: 
-            pass
-    file.close()
-    #Search query for "negative" tweets about AAPL 
-    URLnegative = "https://api.twitter.com/1.1/search/tweets.json?q=AAPL:(&result_type=popular&count=100&tweet_mode=extended"
-    response, data = client.request(URLnegative)
-    file = open("Apple_Tweets.csv", "a")
-    # extracting data in json format and writing it to CSV file 
-    for tweet in json.loads(data)['statuses']:
-        file.write("\",\n")
-        try:
-            file.write("\"")
-            file.write(tweet['full_text'])
+    URL = "https://api.twitter.com/1.1/tweets/search/fullarchive/SentimentalAnalysis.json"
+    file = open("tweets_30day_Tesla.csv" , "a")
+    tokenURL = "https://api.twitter.com/oauth2/token"
+    b_token = r.post(tokenURL, headers = {"Authorization" : "Basic " + str(bearer_token_encoded), "Content-type":"application/x-www-form-urlencoded;charset=UTF-8"},  data = {"grant_type":"client_credentials"})
+    token = b_token.json()["access_token"]
+    header ={"Authorization": "Bearer "+token} 
+    query = "TSLA"
+    daymonth = 311
+    date = "20180" + str(daymonth)+ "0000"
+    toDate = "20180" + str(daymonth)+ "2359"
+    params = {"query":query, "fromDate":date, "toDate":toDate} 
+    #file.write("tweet,date\n")
+    while daymonth>=307:
+        # extracting data in json format and writing it to CSV file
+        data = r.post(URL, data = json.dumps(params), headers = header)
+        data = data.json()
+        #writing first page to file
+        for tweet in data["results"]:
+            try:
+                extended_tweet = tweet["extended_tweet"]
+                text = extended_tweet["full_text"]
+                text = text.replace(",", " ")
+                date = tweet["created_at"]
+                info = "\"" + text+ "\"," + date +"\n"
+                file.write(info)
+                print(info)
+            except Exception: 
+                pass
+        file.write("\n")
+        ''' 
+        #Writing the second page 
+        try: #Sometimes there is no second page. 
+            nextPage = data["next"] 
+            params["next"] = nextPage
+            data = r.post(URL, data = json.dumps(params), headers = header)
+            data = data.json()
+            print("\n\n\nNow page 2:\n\n")
+            for tweet in data["results"]:
+                try:
+                    extended_tweet = tweet["extended_tweet"]
+                    text = extended_tweet["full_text"]
+                    text = text.replace(",", " ")
+                    date = tweet["created_at"]
+                    info = "\"" + text+ "\"," + date +"\n"
+                    file.write(info)
+                    print(info)
+                except Exception: 
+                    pass
         except Exception:
             pass
+        ''' 
+        daymonth = daymonth-1
+        date = "20180" + str(daymonth)+ "0000"
+        toDate = "20180" + str(daymonth)+ "2359"
+        params = {"query":query, "fromDate":date, "toDate":toDate} 
     file.close()
-    
 get_data()
-#data_to_df("Apple_tweets.csv")
