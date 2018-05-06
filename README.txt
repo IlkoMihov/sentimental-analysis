@@ -1,0 +1,10 @@
+Twitter_data.py:
+
+Replace the value of str query (line 27) with the query you would like to search for. For example: "AAPL"(Apple), "TSLA"(Teslä), "BP(British Petroleum), etc.
+replace the value of daymonth (line 30) with the date at which you would like to begin searchin from. For example, 311 is March 11. 
+Line 35: the value in this while loop is the last date that you would like to search till. For example 307 is March 7. 
+Run the file and it will automatically store all required data in CSV format.
+
+Twitter_polarity.py:
+In lines 6,48, 78, and 109 replace the filename with the file that you would like to analyze. The program then does the rest by analyzing the 
+polarity of the tweet and stores the total polarity for day and company in a CSV file. 
