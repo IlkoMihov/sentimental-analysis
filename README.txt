@@ -11,3 +11,9 @@ polarity of the tweet and stores the total polarity for day and company in a CSV
 
 stock-data.ipynb:
 This file will analyze and plot all of the stock data. After double checking to make sure that the file names correspond to your score files in cell 11, run all of the cells from the beginning. 
+
+saveSentimentScores.ipynb: Analyzes every entry's (title + description) with Bluemix Natural Language Understadning and appends sentiment value to the data entry. Saves the new file in: filename_withScores.csv
+
+augmentScores.ipynb: calculates the sentiment scores for every a list of news article
+
+get_news_data.ipynb: gets news article data
